@@ -30,6 +30,7 @@ export class PlanService {
       content: planContent,
       query: planQuery,
       planStats: {},
+      nodeComponents: [],
     };
 
     this.analyzePlan(plan);
@@ -104,6 +105,7 @@ export class PlanService {
         node[NodeProp.ACTUAL_DURATION] = node[NodeProp.ACTUAL_DURATION] * node[NodeProp.ACTUAL_LOOPS];
       }
 
+      node[NodeProp.INCLUSIVE_DURATION] = node[NodeProp.ACTUAL_DURATION];
       node[NodeProp.ACTUAL_DURATION] = node[NodeProp.ACTUAL_DURATION] - this.childrenDuration(node, 0);
     }
 

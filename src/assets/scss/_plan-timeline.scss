@@ -1,0 +1,21 @@
+.plan-timeline {
+  line-height: 0.8em;
+  &.plan-timeline-top {
+    max-height: 30%;
+  }
+  &.plan-timeline-left {
+    table tr td:nth-child(2) {
+      min-width: 200px;
+    }
+  }
+  font-family: $font-family-sans-serif;
+  th {
+    text-transform: uppercase;
+    font-size: $font-size-base;
+    font-weight: 600;
+    margin: 0;
+    color: $text-color;
+    width: 10%;
+    white-space: nowrap;
+  }
+}

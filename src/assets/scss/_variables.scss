@@ -55,7 +55,7 @@ $alert-color: #FB4418;
 
 
 $severity-colors: (
-  1: #fff,
+  1: #ccc,
   2: #fe8,
   3: #e80,
   4: #800
@@ -96,6 +96,11 @@ $yiq-text-light:            $white !default;
       color: color-yiq($value) !important;
       font-weight: normal;
     }
+  }
+
+  .progress-bar.c-#{$color} {
+    background-color: $value;
+    border-color: $value !important;
   }
 
   .text-c-#{$color} {

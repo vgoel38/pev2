@@ -22,6 +22,11 @@ export class Orientation {
   public static CLASSIC: string = 'classic';
 }
 
+export class Side {
+  public static LEFT: string = 'left';
+  public static TOP: string = 'top';
+}
+
 export class NodeProp {
   // plan property keys
   public static NODE_TYPE: string = 'Node Type';
@@ -57,6 +62,7 @@ export class NodeProp {
   public static SLOWEST_NODE: string = '*Slowest Node (by duration)';
 
   public static ACTUAL_DURATION: string = '*Actual Duration';
+  public static INCLUSIVE_DURATION: string = '*Duration (inclusive)';
   public static ACTUAL_COST: string = '*Actual Cost';
   public static PLANNER_ESTIMATE_FACTOR: string = '*Planner Row Estimate Factor';
   public static PLANNER_ESTIMATE_DIRECTION: string = '*Planner Row Estimate Direction';
@@ -99,6 +105,7 @@ nodePropTypes[NodeProp.LARGEST_NODE] = PropType.boolean;
 nodePropTypes[NodeProp.SLOWEST_NODE] = PropType.boolean;
 
 nodePropTypes[NodeProp.ACTUAL_DURATION] = PropType.duration;
+nodePropTypes[NodeProp.INCLUSIVE_DURATION] = PropType.duration;
 nodePropTypes[NodeProp.ACTUAL_COST] = PropType.cost;
 nodePropTypes[NodeProp.PLANNER_ESTIMATE_FACTOR] = PropType.factor;
 nodePropTypes[NodeProp.PLANNER_ESTIMATE_DIRECTION] = PropType.estimateDirection;

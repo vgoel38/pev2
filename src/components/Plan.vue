@@ -73,7 +73,7 @@
       <div v-if="plan.planStats.triggers.length" class="d-inline-block border-left px-2 position-relative">
         <span class="stat-label">Triggers: </span>
         <span class="stat-value">
-          <span :class="'mb-0 p-0 px-1 alert ' + triggerDurationClass(totalTriggerDurationPercent)" v-html="$options.filters.duration(triggersTotalDuration)"></span>
+          <span :class="'mb-0 p-0 px-1 alert ' + durationClass(totalTriggerDurationPercent)" v-html="$options.filters.duration(triggersTotalDuration)"></span>
         </span>
         <button @click.prevent="showTriggers = !showTriggers" class="bg-transparent border-0 p-0 m-0 pl-1">
           <i class="fa fa-caret-down text-muted"></i>
@@ -88,7 +88,7 @@
             <br>
             <span class="text-muted">Called</span> {{ trigger['Calls'] }}<span class="text-muted">&times</span>
             <span class="float-right">
-              <span :class="'p-0 px-1 alert ' + triggerDurationClass(triggerDurationPercent(trigger))" v-html="$options.filters.duration(trigger.Time)"></span>
+              <span :class="'p-0 px-1 alert ' + durationClass(triggerDurationPercent(trigger))" v-html="$options.filters.duration(trigger.Time)"></span>
               | {{ triggerDurationPercent(trigger) }}<span class="text-muted">%</span>
             </span>
             <br>
@@ -122,6 +122,22 @@
           classic
         </button>
       </div>
+      <div class="form-check mr-2 border-left pl-2">
+        <input id="showTimeline" type="checkbox" v-model="viewOptions.showTimeline" class="form-check-input">
+        <label for="showTimeline" class="form-check-label">Timeline</label>
+      </div>
+      <button
+        :class="['d-inline-block btn btn-xs mr-2 rounded-0', viewOptions.timelineSide == sides.LEFT ? 'border-dark bg-secondary' : 'border-secondary bg-light']"
+        style="border-left-width: 4px !important; width: 15px; height: 15px;"
+        @click="viewOptions.timelineSide = sides.LEFT"
+      >
+      </button>
+      <button
+        :class="['d-inline-block btn btn-xs mr-2 rounded-0', viewOptions.timelineSide == sides.TOP ? 'border-dark bg-secondary' : 'border-secondary bg-light']"
+        style="border-top-width: 4px !important; width: 15px; height: 15px;"
+        @click="viewOptions.timelineSide = sides.TOP"
+      >
+      </button>
       <div class="form-group mr-2 pl-2 border-left">
         <label class="mr-2 text-muted">Graph metric:</label>
         <div class="btn-group btn-group-xs">
@@ -140,6 +156,7 @@
         <label for="showPlannerEstimate" class="form-check-label">Estimations</label>
       </div>
     </div>
+
 
     <div v-if="validationMessage" class="h-100 w-100 d-flex justify-content-center">
       <div class="alert alert-danger align-self-center">{{validationMessage}}</div>
@@ -169,13 +186,38 @@
         </div>
       </div>
     </div>
-    <div class="overflow-auto flex-grow-1 flex-shrink-1 mt-1" v-else v-dragscroll v-on:mousedown="menuHidden = true">
-      <div class="plan h-100 w-100 d-flex grab-bing">
-        <ul class="node-children">
-          <li>
-            <plan-node :node="rootNode" :plan="plan" :viewOptions="viewOptions" ref="root"/>
-          </li>
-        </ul>
+    <div v-else :class="['flex-grow-1 flex-shrink-1 d-flex', {'flex-column': viewOptions.timelineSide == sides.TOP}]">
+      <div ref="timeline"
+           :class="['plan-timeline overflow-auto flex-shrink-0', viewOptions.timelineSide == sides.TOP ? 'border-bottom plan-timeline-top' : 'border-right plan-timeline-left h-100']"
+        v-if="viewOptions.showTimeline"
+      >
+        <table class="my-1 table-hover" v-if="flat">
+          <tbody>
+            <tr v-for="row in flat" :content="timelineTooltip(row[1])" v-tippy="{arrow: true, animation: 'fade', delay: [200, 0]}" @click.prevent="showNode(row[1], false, true)">
+              <th class="node-type pr-2">
+                <template v-for="i in lodash.range(row[0])">
+                  &nbsp;&nbsp;
+                </template>
+                {{ row[1].rootNode[nodeProps.NODE_TYPE] }}
+              </th>
+              <td>
+                <div class="progress rounded-0 align-items-center bg-transparent" style="height: 5px;">
+                  <div class="bg-secondary" role="progressbar" :style="'opacity: 0.2;width: ' + (row[1].rootNode[nodeProps.INCLUSIVE_DURATION] - row[1].rootNode[nodeProps.ACTUAL_DURATION]) / (plan.planStats.executionTime || plan.content.Plan[nodeProps.ACTUAL_TOTAL_TIME]) * 100 + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 1px;"></div>
+                  <div :class="['progress-bar border-left', durationClass(row[1].executionTimePercent)]" role="progressbar" :style="'width: ' + row[1].rootNode[nodeProps.ACTUAL_DURATION] / (plan.planStats.executionTime || plan.content.Plan[nodeProps.ACTUAL_TOTAL_TIME]) * 100 + '%; height:5px;'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div ref="plan" class="overflow-auto flex-grow-1 flex-shrink-1 p-1" v-dragscroll v-on:mousedown="menuHidden = true">
+        <div class="plan h-100 w-100 d-flex grab-bing">
+          <ul class="node-children">
+            <li>
+              <plan-node :node="rootNode" :plan="plan" :viewOptions="viewOptions" ref="root"/>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
@@ -183,17 +225,23 @@
 
 <script lang="ts">
 import * as _ from 'lodash';
+import tippy from 'tippy.js';
 
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import PlanNode from '@/components/PlanNode.vue';
 import { HelpService, scrollChildIntoParentView } from '@/services/help-service';
 import { PlanService } from '@/services/plan-service';
 import { cost, duration, rows } from '@/filters';
-import { HighlightType, NodeProp, Orientation, ViewMode } from '../enums';
+import { HighlightType, NodeProp, Orientation, Side, ViewMode } from '../enums';
 import { IPlan } from '../iplan';
+import Node from '../inode';
 
 import VueDragscroll from 'vue-dragscroll';
 Vue.use(VueDragscroll);
+
+import VueTippy, { TippyComponent } from 'vue-tippy';
+Vue.use(VueTippy);
+Vue.component('tippy', TippyComponent);
 
 import { dragscroll } from 'vue-dragscroll';
 
@@ -212,10 +260,16 @@ import { dragscroll } from 'vue-dragscroll';
   },
 })
 export default class Plan extends Vue {
+  public $refs!: {
+    plan: HTMLElement,
+    root: PlanNode,
+  };
+
   @Prop(String) private planSource!: string;
   @Prop(String) private planQuery!: string;
   private plan!: IPlan | null;
   private rootNode!: any;
+  private flat: any[] = [];
   private menuHidden: boolean = true;
   private validationMessage: string = '';
   private showTriggers: boolean = false;
@@ -223,6 +277,7 @@ export default class Plan extends Vue {
   private sourceTabActive: string = 'plan';
 
   private helpService = new HelpService();
+  private lodash = _;
 
   private viewOptions: any = {
     menuHidden: true,
@@ -233,11 +288,14 @@ export default class Plan extends Vue {
     highlightType: HighlightType.NONE,
     viewMode: ViewMode.FULL,
     orientation: Orientation.TWOD,
+    showTimeline: true,
+    timelineSide: Side.LEFT,
   };
 
   private highlightTypes = HighlightType;
   private viewModes = ViewMode;
   private orientations = Orientation;
+  private sides = Side;
 
   private planService = new PlanService();
   private nodeProps = NodeProp;
@@ -270,7 +328,15 @@ export default class Plan extends Vue {
 
     window.setTimeout(() => {
       this.showNode(this.$refs.root as PlanNode, true, false);
+      // build the timeline structure
+      // with level and reference to PlanNode components for interaction
+      if (!this.plan) {
+        return;
+      }
+      const components = this.plan.nodeComponents;
+      this.flatten(this.flat, 0, this.node, components);
     }, 200);
+
   }
 
   @Watch('viewOptions', {deep: true})
@@ -291,7 +357,7 @@ export default class Plan extends Vue {
   }
 
   private showNode(nodeCmp: PlanNode, shouldCenter: boolean, highlight: boolean) {
-    const parent = document.querySelector('.plan-container .overflow-auto');
+    const parent = this.$refs.plan;
     if (!parent) {
       return;
     }
@@ -326,15 +392,40 @@ export default class Plan extends Vue {
     return _.round(time / executionTime * 100);
   }
 
-  private triggerDurationClass(triggerDurationPercent: number) {
+  private flatten(output: any[], level: number, node: Node, components: PlanNode[]) {
+    output.push([level, components.shift()]);
+    _.each(node.Plans, (subnode) => {
+      this.flatten(output, level + 1, subnode, components);
+    });
+  }
+
+  private toggleTimeline(): void {
+    this.viewOptions.showTimeline = !this.viewOptions.showTimeline;
+  }
+
+  private timelineTooltip(cmp: PlanNode): string {
+    if (this.plan) {
+      return [
+        'Duration: ',
+        duration(cmp.node[NodeProp.ACTUAL_DURATION], true),
+        ' | ',
+        cmp.executionTimePercent,
+        '%',
+      ].join('');
+    }
+    return '';
+  }
+
+  private durationClass(i: number) {
     let c;
-    const i = triggerDurationPercent;
     if (i > 90) {
       c = 4;
     } else if (i > 40) {
       c = 3;
     } else if (i > 10) {
       c = 2;
+    } else {
+      c = 1;
     }
     if (c) {
       return 'c-' + c;
@@ -368,5 +459,5 @@ export default class Plan extends Vue {
 
 <style lang="scss">
 @import '../assets/scss/plan';
-
+@import '../assets/scss/plan-timeline';
 </style>
