@@ -73,7 +73,7 @@
       <div v-if="plan.planStats.triggers.length" class="d-inline-block border-left px-2 position-relative">
         <span class="stat-label">Triggers: </span>
         <span class="stat-value">
-          <span :class="'mb-0 p-0 px-1 alert ' + durationClass(totalTriggerDurationPercent)" v-html="$options.filters.duration(triggersTotalDuration)"></span>
+          <span :class="'mb-0 p-0 px-1 alert ' + $options.filters.durationClass(totalTriggerDurationPercent)" v-html="$options.filters.duration(triggersTotalDuration)"></span>
         </span>
         <button @click.prevent="showTriggers = !showTriggers" class="bg-transparent border-0 p-0 m-0 pl-1">
           <i class="fa fa-caret-down text-muted"></i>
@@ -88,7 +88,7 @@
             <br>
             <span class="text-muted">Called</span> {{ trigger['Calls'] }}<span class="text-muted">&times</span>
             <span class="float-right">
-              <span :class="'p-0 px-1 alert ' + durationClass(triggerDurationPercent(trigger))" v-html="$options.filters.duration(trigger.Time)"></span>
+              <span :class="'p-0 px-1 alert ' + $options.filters.durationClass(triggerDurationPercent(trigger))" v-html="$options.filters.duration(trigger.Time)"></span>
               | {{ triggerDurationPercent(trigger) }}<span class="text-muted">%</span>
             </span>
             <br>
@@ -191,24 +191,7 @@
            :class="['plan-timeline overflow-auto flex-shrink-0', viewOptions.timelineSide == sides.TOP ? 'border-bottom plan-timeline-top' : 'border-right plan-timeline-left h-100']"
         v-if="viewOptions.showTimeline"
       >
-        <table class="my-1 table-hover" v-if="flat">
-          <tbody>
-            <tr v-for="row in flat" :content="timelineTooltip(row[1])" v-tippy="{arrow: true, animation: 'fade', delay: [200, 0]}" @click.prevent="showNode(row[1], false, true)">
-              <th class="node-type pr-2">
-                <template v-for="i in lodash.range(row[0])">
-                  &nbsp;&nbsp;
-                </template>
-                {{ row[1].rootNode[nodeProps.NODE_TYPE] }}
-              </th>
-              <td>
-                <div class="progress rounded-0 align-items-center bg-transparent" style="height: 5px;">
-                  <div class="bg-secondary" role="progressbar" :style="'opacity: 0.2;width: ' + (row[1].rootNode[nodeProps.INCLUSIVE_DURATION] - row[1].rootNode[nodeProps.ACTUAL_DURATION]) / (plan.planStats.executionTime || plan.content.Plan[nodeProps.ACTUAL_TOTAL_TIME]) * 100 + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 1px;"></div>
-                  <div :class="['progress-bar border-left', durationClass(row[1].executionTimePercent)]" role="progressbar" :style="'width: ' + row[1].rootNode[nodeProps.ACTUAL_DURATION] / (plan.planStats.executionTime || plan.content.Plan[nodeProps.ACTUAL_TOTAL_TIME]) * 100 + '%; height:5px;'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <diagram :data="flat" :plan="plan" :showNode="showNode" v-if="flat"></diagram>
       </div>
       <div ref="plan" class="overflow-auto flex-grow-1 flex-shrink-1 p-1" v-dragscroll v-on:mousedown="menuHidden = true">
         <div class="plan h-100 w-100 d-flex grab-bing">
@@ -229,9 +212,10 @@ import tippy from 'tippy.js';
 
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import PlanNode from '@/components/PlanNode.vue';
+import Diagram from '@/components/Diagram.vue';
 import { HelpService, scrollChildIntoParentView } from '@/services/help-service';
 import { PlanService } from '@/services/plan-service';
-import { cost, duration, rows } from '@/filters';
+import { cost, duration, durationClass, rows } from '@/filters';
 import { HighlightType, NodeProp, Orientation, Side, ViewMode } from '../enums';
 import { IPlan } from '../iplan';
 import Node from '../inode';
@@ -249,6 +233,7 @@ import { dragscroll } from 'vue-dragscroll';
   name: 'plan',
   components: {
     PlanNode,
+    Diagram,
   },
   directives: {
     dragscroll,
@@ -256,6 +241,7 @@ import { dragscroll } from 'vue-dragscroll';
   filters: {
     cost,
     duration,
+    durationClass,
     rows,
   },
 })
