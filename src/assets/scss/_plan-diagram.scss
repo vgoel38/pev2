@@ -9,6 +9,10 @@
     }
   }
   font-family: $font-family-sans-serif;
+
+  table {
+    cursor: pointer;
+  }
   th {
     text-transform: uppercase;
     font-size: $font-size-base;
