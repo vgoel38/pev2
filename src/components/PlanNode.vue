@@ -79,16 +79,6 @@
           <pre class="plan-query-text"><code v-html="getFormattedQuery()"></code></pre>
         </div>
 
-        <div v-if="viewOptions.highlightType !== highlightTypes.NONE && highlightValue !== null">
-          <div class="progress node-bar-container" style="height: 5px;">
-            <div class="progress-bar" role="progressbar" v-bind:style="{ width: barWidth + '%', 'background-color': getBarColor(barWidth)}" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-          </div>
-          <span class="node-bar-label" v-if="shouldShowNodeBarLabel()">
-            <span class="text-muted">{{viewOptions.highlightType}}:</span>&nbsp;
-            <span v-html="highlightValue"></span>
-          </span>
-        </div>
-
         <div v-if="shouldShowCost && node[nodeProps.ACTUAL_COST]">
           <span>
             Cost:
@@ -168,7 +158,7 @@ import { HelpService } from '@/services/help-service';
 import { ColorService } from '@/services/color-service';
 import { SyntaxHighlightService } from '@/services/syntax-highlight-service';
 import { cost, duration, factor, formatNodeProp, keysToString, truncate, rows } from '@/filters';
-import { EstimateDirection, HighlightType, NodeProp, nodePropTypes, Orientation,
+import { EstimateDirection, NodeProp, nodePropTypes, Orientation,
          PropType, ViewMode, WorkerProp } from '@/enums';
 import * as _ from 'lodash';
 
@@ -197,8 +187,6 @@ export default class PlanNode extends Vue {
 
   // calculated properties
   private costPercent: number = NaN;
-  private barWidth: number = 0;
-  private highlightValue?: string | null;
   private props: any[] = [];
   private plans: any[] = [];
   private plannerRowEstimateValue?: number;
@@ -209,7 +197,6 @@ export default class PlanNode extends Vue {
 
   // expose enum to view
   private estimateDirections = EstimateDirection;
-  private highlightTypes = HighlightType;
   private viewModes = ViewMode;
   private orientations = Orientation;
 
@@ -222,7 +209,6 @@ export default class PlanNode extends Vue {
 
   private created(): void {
     this.calculateProps();
-    this.calculateBar();
     this.calculateDuration();
     this.calculateCost();
 
@@ -309,43 +295,6 @@ export default class PlanNode extends Vue {
     }
 
     return true;
-  }
-
-  @Watch('viewOptions.highlightType')
-  private calculateBar(): void {
-    let value: number;
-    if (!this.$options || !this.$options.filters) {
-      return;
-    }
-    switch (this.viewOptions.highlightType) {
-      case HighlightType.DURATION:
-        value = (this.node[NodeProp.ACTUAL_DURATION]);
-        if (value === undefined) {
-          this.highlightValue = null;
-          break;
-        }
-        this.barWidth = Math.round(value / this.plan.planStats.maxDuration * 100);
-        this.highlightValue = this.$options.filters.duration(value);
-        break;
-      case HighlightType.ROWS:
-        value = (this.node[NodeProp.ACTUAL_ROWS]);
-        if (value === undefined) {
-          this.highlightValue = null;
-          break;
-        }
-        this.barWidth = Math.round(value / this.plan.planStats.maxRows * 100) || 0;
-        this.highlightValue = this.$options.filters.rows(value);
-        break;
-      case HighlightType.COST:
-        value = (this.node[NodeProp.ACTUAL_COST]);
-        if (value === undefined) {
-          this.highlightValue = null;
-          break;
-        }
-        this.barWidth = Math.round(value / this.plan.planStats.maxCost * 100);
-        this.highlightValue = this.$options.filters.cost(value);
-        break;
-    }
   }
 
   private getBarColor(percent: number) {

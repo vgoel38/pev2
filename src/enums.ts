@@ -1,6 +1,5 @@
-export class HighlightType {
-    public static NONE: string = 'none';
-    public static DURATION: string = 'duration';
+export class Metric {
+    public static TIME: string = 'time';
     public static ROWS: string = 'rows';
     public static COST: string = 'cost';
 }

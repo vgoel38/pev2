@@ -123,30 +123,21 @@
         </button>
       </div>
       <div class="form-check mr-2 border-left pl-2">
-        <input id="showTimeline" type="checkbox" v-model="viewOptions.showTimeline" class="form-check-input">
-        <label for="showTimeline" class="form-check-label">Timeline</label>
+        <input id="showDiagram" type="checkbox" v-model="viewOptions.showDiagram" class="form-check-input">
+        <label for="showDiagram" class="form-check-label">Diagram</label>
       </div>
       <button
-        :class="['d-inline-block btn btn-xs mr-2 rounded-0', viewOptions.timelineSide == sides.LEFT ? 'border-dark bg-secondary' : 'border-secondary bg-light']"
+        :class="['d-inline-block btn btn-xs mr-2 rounded-0', viewOptions.diagramSide == sides.LEFT ? 'border-dark bg-secondary' : 'border-secondary bg-light']"
         style="border-left-width: 4px !important; width: 15px; height: 15px;"
-        @click="viewOptions.timelineSide = sides.LEFT"
+        @click="viewOptions.diagramSide = sides.LEFT"
       >
       </button>
       <button
-        :class="['d-inline-block btn btn-xs mr-2 rounded-0', viewOptions.timelineSide == sides.TOP ? 'border-dark bg-secondary' : 'border-secondary bg-light']"
+        :class="['d-inline-block btn btn-xs mr-2 rounded-0', viewOptions.diagramSide == sides.TOP ? 'border-dark bg-secondary' : 'border-secondary bg-light']"
         style="border-top-width: 4px !important; width: 15px; height: 15px;"
-        @click="viewOptions.timelineSide = sides.TOP"
+        @click="viewOptions.diagramSide = sides.TOP"
       >
       </button>
-      <div class="form-group mr-2 pl-2 border-left">
-        <label class="mr-2 text-muted">Graph metric:</label>
-        <div class="btn-group btn-group-xs">
-          <button class="btn btn-outline-secondary" :class="{'active': viewOptions.highlightType === highlightTypes.NONE}" v-on:click="viewOptions.highlightType = highlightTypes.NONE">none</button>
-          <button class="btn btn-outline-secondary" :class="{'active': viewOptions.highlightType === highlightTypes.DURATION}" v-on:click="viewOptions.highlightType = highlightTypes.DURATION" :disabled="!rootNode[nodeProps.ACTUAL_DURATION]">duration</button>
-          <button class="btn btn-outline-secondary" :class="{'active': viewOptions.highlightType === highlightTypes.ROWS}" v-on:click="viewOptions.highlightType = highlightTypes.ROWS" :disabled="rootNode[nodeProps.ACTUAL_ROWS] === undefined">rows</button>
-          <button class="btn btn-outline-secondary" :class="{'active': viewOptions.highlightType === highlightTypes.COST}" v-on:click="viewOptions.highlightType = highlightTypes.COST" :disabled="rootNode[nodeProps.TOTAL_COST] === undefined">cost</button>
-        </div>
-      </div>
       <div class="form-check mr-2 pl-2 border-left">
         <input id="showCost" type="checkbox" v-model="viewOptions.showCost" class="form-check-input" :disabled="rootNode[nodeProps.TOTAL_COST] === undefined">
         <label for="showCost" class="form-check-label">Cost</label>
@@ -186,10 +177,10 @@
         </div>
       </div>
     </div>
-    <div v-else :class="['flex-grow-1 flex-shrink-1 d-flex', {'flex-column': viewOptions.timelineSide == sides.TOP}]">
-      <div ref="timeline"
-           :class="['plan-timeline overflow-auto flex-shrink-0', viewOptions.timelineSide == sides.TOP ? 'border-bottom plan-timeline-top' : 'border-right plan-timeline-left h-100']"
-        v-if="viewOptions.showTimeline"
+    <div v-else :class="['flex-grow-1 flex-shrink-1 d-flex', {'flex-column': viewOptions.diagramSide == sides.TOP}]">
+      <div ref="diagram"
+           :class="['plan-diagram overflow-auto flex-shrink-0', viewOptions.diagramSide == sides.TOP ? 'border-bottom plan-diagram-top' : 'border-right plan-diagram-left h-100']"
+        v-if="viewOptions.showDiagram"
       >
         <diagram :data="flat" :plan="plan" :showNode="showNode" v-if="flat"></diagram>
       </div>
@@ -216,7 +207,7 @@ import Diagram from '@/components/Diagram.vue';
 import { HelpService, scrollChildIntoParentView } from '@/services/help-service';
 import { PlanService } from '@/services/plan-service';
 import { cost, duration, durationClass, rows } from '@/filters';
-import { HighlightType, NodeProp, Orientation, Side, ViewMode } from '../enums';
+import { NodeProp, Orientation, Side, ViewMode } from '../enums';
 import { IPlan } from '../iplan';
 import Node from '../inode';
 
@@ -267,18 +258,15 @@ export default class Plan extends Vue {
 
   private viewOptions: any = {
     menuHidden: true,
-    showHighlightBar: false,
     showPlannerEstimate: false,
     showCost: false,
     showPlanStats: true,
-    highlightType: HighlightType.NONE,
     viewMode: ViewMode.FULL,
     orientation: Orientation.TWOD,
-    showTimeline: true,
-    timelineSide: Side.LEFT,
+    showDiagram: true,
+    diagramSide: Side.LEFT,
   };
 
-  private highlightTypes = HighlightType;
   private viewModes = ViewMode;
   private orientations = Orientation;
   private sides = Side;
@@ -314,13 +302,13 @@ export default class Plan extends Vue {
 
     window.setTimeout(() => {
       this.showNode(this.$refs.root as PlanNode, true, false);
-      // build the timeline structure
+      // build the diagram structure
       // with level and reference to PlanNode components for interaction
       if (!this.plan) {
         return;
       }
       const components = this.plan.nodeComponents;
-      this.flatten(this.flat, 0, this.node, components);
+      this.flatten(this.flat, 0, this.rootNode, components);
     }, 200);
 
   }
@@ -385,8 +373,8 @@ export default class Plan extends Vue {
     });
   }
 
-  private toggleTimeline(): void {
-    this.viewOptions.showTimeline = !this.viewOptions.showTimeline;
+  private toggleDiagram(): void {
+    this.viewOptions.showDiagram = !this.viewOptions.showDiagram;
   }
 
   private timelineTooltip(cmp: PlanNode): string {
@@ -445,5 +433,5 @@ export default class Plan extends Vue {
 
 <style lang="scss">
 @import '../assets/scss/plan';
-@import '../assets/scss/plan-timeline';
+@import '../assets/scss/plan-diagram';
 </style>

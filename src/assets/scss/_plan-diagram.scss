@@ -1,9 +1,9 @@
-.plan-timeline {
+.plan-diagram {
   line-height: 0.8em;
-  &.plan-timeline-top {
+  &.plan-diagram-top {
     max-height: 30%;
   }
-  &.plan-timeline-left {
+  &.plan-diagram-left {
     table tr td:nth-child(2) {
       min-width: 200px;
     }
