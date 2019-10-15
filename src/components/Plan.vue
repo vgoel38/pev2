@@ -177,7 +177,7 @@
         </div>
       </div>
     </div>
-    <div v-else :class="['flex-grow-1 flex-shrink-1 d-flex', {'flex-column': viewOptions.diagramSide == sides.TOP}]">
+    <div v-else :class="['overflow-hidden flex-grow-1 flex-shrink-1 d-flex', {'flex-column': viewOptions.diagramSide == sides.TOP}]">
       <div ref="diagram"
            :class="['plan-diagram overflow-auto flex-shrink-0', viewOptions.diagramSide == sides.TOP ? 'border-bottom plan-diagram-top' : 'border-right plan-diagram-left h-100']"
         v-if="viewOptions.showDiagram"
