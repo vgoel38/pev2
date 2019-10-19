@@ -24,5 +24,6 @@ export interface IPlanStats {
   maxRows?: number;
   maxCost?: number;
   maxDuration?: number;
+  maxSharedBlocks?: number;
   triggers?: ITrigger[];
 }

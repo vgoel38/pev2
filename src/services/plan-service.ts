@@ -10,10 +10,10 @@ export class PlanService {
 
   private static instance: PlanService;
 
-
   private maxRows: number | undefined;
   private maxCost: number | undefined;
   private maxDuration: number | undefined;
+  private maxSharedBlocks: number | undefined;
 
   public createPlan(planName: string, planContent: any, planQuery: string): IPlan {
     // remove any extra white spaces in the middle of query
@@ -45,6 +45,7 @@ export class PlanService {
     plan.content.maxRows = this.maxRows;
     plan.content.maxCost = this.maxCost;
     plan.content.maxDuration = this.maxDuration;
+    plan.content.maxSharedBlocks = this.maxSharedBlocks;
   }
 
   // recursively walk down the plan to compute various metrics
@@ -92,6 +93,19 @@ export class PlanService {
     if (slowest) {
       slowest[NodeProp.SLOWEST_NODE] = true;
       this.maxDuration = slowest[NodeProp.ACTUAL_DURATION];
+    }
+
+    function sumBuffers(o: Node) {
+      return o[NodeProp.SHARED_HIT_BLOCKS] +
+        o[NodeProp.SHARED_READ_BLOCKS] +
+        o[NodeProp.SHARED_DIRTIED_BLOCKS] +
+        o[NodeProp.SHARED_WRITTEN_BLOCKS];
+    }
+    const highestSharedBuffers = _.maxBy(flat, (o) => {
+      return sumBuffers(o);
+    });
+    if (highestSharedBuffers) {
+      this.maxSharedBlocks = sumBuffers(highestSharedBuffers);
     }
   }
 
@@ -595,6 +609,10 @@ export class PlanService {
         const m = bufferInfoRegex.exec(infos);
         if (m) {
           const type = m[1];
+          // Initiate with default value
+          _.each(['hit', 'read', 'written', 'dirtied'], (method) => {
+            el[_.map([type, method, 'blocks'], _.capitalize).join(' ')] = 0;
+          });
           _.each(m[2].split(/\s+/), (buffer) => {
             this.parseBuffer(buffer, type, el);
           });

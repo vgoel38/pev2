@@ -297,6 +297,7 @@ export default class Plan extends Vue {
       maxRows: content.maxRows || null,
       maxCost: content.maxCost || null,
       maxDuration: content.maxDuration || null,
+      maxSharedBlocks: content.maxSharedBlocks || null,
       triggers: content.Triggers || [],
     };
 

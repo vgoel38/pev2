@@ -2,6 +2,7 @@ export class Metric {
     public static TIME: string = 'time';
     public static ROWS: string = 'rows';
     public static COST: string = 'cost';
+    public static SHARED_HIT: string = 'shared hit';
 }
 
 export enum EstimateDirection {
@@ -54,6 +55,10 @@ export class NodeProp {
   public static WORKERS: string = 'Workers';
   public static WORKERS_PLANNED: string = 'Workers Planned';
   public static WORKERS_LAUNCHED: string = 'Workers Launched';
+  public static SHARED_HIT_BLOCKS: string = 'Shared Hit Blocks';
+  public static SHARED_READ_BLOCKS: string = 'Shared Read Blocks';
+  public static SHARED_DIRTIED_BLOCKS: string = 'Shared Dirtied Blocks';
+  public static SHARED_WRITTEN_BLOCKS: string = 'Shared Written Blocks';
 
   // computed by pev
   public static COSTLIEST_NODE: string = '*Costiest Node (by cost)';
