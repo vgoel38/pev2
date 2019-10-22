@@ -2,7 +2,21 @@ export class Metric {
     public static TIME: string = 'time';
     public static ROWS: string = 'rows';
     public static COST: string = 'cost';
-    public static SHARED_HIT: string = 'shared hit';
+    public static SHARED: string = 'shared';
+    public static TEMP: string = 'temp';
+}
+
+export enum BufferLocation {
+  shared = 'Shared',
+  temp = 'Temp',
+  local = 'Local',
+}
+
+export enum BufferType {
+  hit = 'Hit',
+  read = 'Read',
+  written = 'Written',
+  dirtied = 'Dirtied',
 }
 
 export enum EstimateDirection {
@@ -59,6 +73,10 @@ export class NodeProp {
   public static SHARED_READ_BLOCKS: string = 'Shared Read Blocks';
   public static SHARED_DIRTIED_BLOCKS: string = 'Shared Dirtied Blocks';
   public static SHARED_WRITTEN_BLOCKS: string = 'Shared Written Blocks';
+  public static TEMP_HIT_BLOCKS: string = 'Temp Hit Blocks';
+  public static TEMP_READ_BLOCKS: string = 'Temp Read Blocks';
+  public static TEMP_DIRTIED_BLOCKS: string = 'Temp Dirtied Blocks';
+  public static TEMP_WRITTEN_BLOCKS: string = 'Temp Written Blocks';
 
   // computed by pev
   public static COSTLIEST_NODE: string = '*Costiest Node (by cost)';

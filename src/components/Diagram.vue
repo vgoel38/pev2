@@ -5,34 +5,38 @@
         <button class="btn btn-outline-secondary" :class="{'active': metric === metrics.TIME}" v-on:click="metric = metrics.TIME">time</button>
         <button class="btn btn-outline-secondary" :class="{'active': metric === metrics.ROWS}" v-on:click="metric = metrics.ROWS">rows</button>
         <button class="btn btn-outline-secondary" :class="{'active': metric === metrics.COST}" v-on:click="metric = metrics.COST">cost</button>
-        <button class="btn btn-outline-secondary" :class="{'active': metric === metrics.SHARED_HIT}" v-on:click="metric = metrics.SHARED_HIT">buffers shared</button>
+        <button class="btn btn-outline-secondary" :class="{'active': metric === metrics.SHARED}" v-on:click="metric = metrics.SHARED">{{ metrics.SHARED }}</button>
+        <button class="btn btn-outline-secondary" :class="{'active': metric === metrics.TEMP}" v-on:click="metric = metrics.TEMP">{{ metrics.TEMP }}</button>
       </div>
     </div>
     <table class="my-1 table-hover">
       <tbody>
         <tr v-for="row in data" :content="tooltip(row[1])" v-tippy="{arrow: true, animation: 'fade', delay: [200, 0]}" @click.prevent="showNode(row[1], false, true)">
           <th class="node-type pr-2">
-            <template v-for="i in lodash.range(row[0])">
-              &nbsp;&nbsp;
-            </template>
-            {{ nodeType(row) }}
+            <template v-for="i in lodash.range(row[0])">⠀</template>{{ nodeType(row) }}
           </th>
           <td>
             <div class="progress rounded-0 align-items-center bg-transparent" style="height: 5px;" v-if="metric == metrics.TIME">
               <div class="bg-secondary" role="progressbar" :style="'opacity: 0.2;width: ' + (row[1].node[nodeProps.INCLUSIVE_DURATION] - row[1].node[nodeProps.ACTUAL_DURATION]) / (plan.planStats.executionTime || plan.content.Plan[nodeProps.ACTUAL_TOTAL_TIME]) * 100 + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 1px;"></div>
               <div class="progress-bar border-left bg-secondary" role="progressbar" :style="'width: ' + row[1].node[nodeProps.ACTUAL_DURATION] / (plan.planStats.executionTime || plan.content.Plan[nodeProps.ACTUAL_TOTAL_TIME]) * 100 + '%; height:5px;'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
-            <div class="progress rounded-0 align-items-center bg-transparent" style="height: 5px;" v-if="metric == metrics.ROWS">
+            <div class="progress rounded-0 align-items-center bg-transparent" style="height: 5px;" v-else-if="metric == metrics.ROWS">
               <div class="bg-secondary" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.ACTUAL_ROWS] / plan.planStats.maxRows * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
             </div>
-            <div class="progress rounded-0 align-items-center bg-transparent" style="height: 5px;" v-if="metric == metrics.COST">
+            <div class="progress rounded-0 align-items-center bg-transparent" style="height: 5px;" v-else-if="metric == metrics.COST">
               <div class="bg-secondary" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.ACTUAL_COST] / plan.planStats.maxCost * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
             </div>
-            <div class="progress rounded-0 align-items-center bg-transparent" style="height: 5px;" v-if="metric == metrics.SHARED_HIT">
-              <div class="bg-secondary" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.SHARED_HIT_BLOCKS] / plan.planStats.maxSharedBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
-              <div class="bg-success" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.SHARED_READ_BLOCKS] / plan.planStats.maxSharedBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
-              <div class="bg-danger" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.SHARED_WRITTEN_BLOCKS] / plan.planStats.maxSharedBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
-              <div class="bg-danger" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.SHARED_DIRTIED_BLOCKS] / plan.planStats.maxSharedBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
+            <div class="progress rounded-0 align-items-center bg-transparent" style="height: 5px;" v-else-if="metric == metrics.SHARED && plan.planStats.maxSharedBlocks">
+              <div class="bg-hit" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.SHARED_HIT_BLOCKS] / plan.planStats.maxSharedBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
+              <div class="bg-read" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.SHARED_READ_BLOCKS] / plan.planStats.maxSharedBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
+              <div class="bg-written" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.SHARED_WRITTEN_BLOCKS] / plan.planStats.maxSharedBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
+              <div class="bg-dirtied" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.SHARED_DIRTIED_BLOCKS] / plan.planStats.maxSharedBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
+            </div>
+            <div class="progress rounded-0 align-items-center bg-transparent" style="height: 5px;" v-else-if="metric == metrics.TEMP && plan.planStats.maxTempBlocks">
+              <div class="bg-hit" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.TEMP_HIT_BLOCKS] / plan.planStats.maxTempBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
+              <div class="bg-read" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.TEMP_READ_BLOCKS] / plan.planStats.maxTempBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
+              <div class="bg-written" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.TEMP_WRITTEN_BLOCKS] / plan.planStats.maxTempBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
+              <div class="bg-dirtied" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.TEMP_DIRTIED_BLOCKS] / plan.planStats.maxTempBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
             </div>
           </td>
         </tr>
@@ -63,7 +67,7 @@ export default class Diagram extends Vue {
   private nodeProps = NodeProp;
   private metrics = Metric;
 
-  private metric: string = Metric.SHARED_HIT;
+  private metric: string = Metric.SHARED;
 
   private tooltip(cmp: PlanNode): string {
     switch (this.metric) {
@@ -73,8 +77,10 @@ export default class Diagram extends Vue {
         return this.rowsTooltip(cmp);
       case Metric.COST:
         return this.costTooltip(cmp);
-      case Metric.SHARED_HIT:
+      case Metric.SHARED:
         return this.sharedBuffersTooltip(cmp);
+      case Metric.TEMP:
+        return this.tempBuffersTooltip(cmp);
     }
     return '';
   }
@@ -104,6 +110,9 @@ export default class Diagram extends Vue {
   }
 
   private sharedBuffersTooltip(cmp: PlanNode): string {
+    if (!this.plan.planStats.maxSharedBlocks) {
+      return 'N/A';
+    }
     let text = 'Shared Blocks:';
     const hit = cmp.node[NodeProp.SHARED_HIT_BLOCKS];
     text += hit !== 0 ? '<br>Hit: ' + rows(hit) : '';
@@ -112,6 +121,22 @@ export default class Diagram extends Vue {
     const written = cmp.node[NodeProp.SHARED_WRITTEN_BLOCKS];
     text += written !== 0 ? '<br>Written: ' + rows(written) : '';
     const dirtied = cmp.node[NodeProp.SHARED_DIRTIED_BLOCKS];
+    text += dirtied !== 0 ? '<br>Dirtied: ' + rows(dirtied) : '';
+    return text;
+  }
+
+  private tempBuffersTooltip(cmp: PlanNode): string {
+    if (!this.plan.planStats.maxTempBlocks) {
+      return 'N/A';
+    }
+    let text = 'Temp Blocks:';
+    const hit = cmp.node[NodeProp.TEMP_HIT_BLOCKS];
+    text += hit !== 0 ? '<br>Hit: ' + rows(hit) : '';
+    const read = cmp.node[NodeProp.TEMP_READ_BLOCKS];
+    text += read !== 0 ? '<br>Read: ' + rows(read) : '';
+    const written = cmp.node[NodeProp.TEMP_WRITTEN_BLOCKS];
+    text += written !== 0 ? '<br>Written: ' + rows(written) : '';
+    const dirtied = cmp.node[NodeProp.TEMP_DIRTIED_BLOCKS];
     text += dirtied !== 0 ? '<br>Dirtied: ' + rows(dirtied) : '';
     return text;
   }

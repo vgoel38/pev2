@@ -14,6 +14,7 @@ export class PlanService {
   private maxCost: number | undefined;
   private maxDuration: number | undefined;
   private maxSharedBlocks: number | undefined;
+  private maxTempBlocks: number | undefined;
 
   public createPlan(planName: string, planContent: any, planQuery: string): IPlan {
     // remove any extra white spaces in the middle of query
@@ -46,6 +47,7 @@ export class PlanService {
     plan.content.maxCost = this.maxCost;
     plan.content.maxDuration = this.maxDuration;
     plan.content.maxSharedBlocks = this.maxSharedBlocks;
+    plan.content.maxTempBlocks = this.maxTempBlocks;
   }
 
   // recursively walk down the plan to compute various metrics
@@ -95,17 +97,30 @@ export class PlanService {
       this.maxDuration = slowest[NodeProp.ACTUAL_DURATION];
     }
 
-    function sumBuffers(o: Node) {
+    function sumShared(o: Node) {
       return o[NodeProp.SHARED_HIT_BLOCKS] +
         o[NodeProp.SHARED_READ_BLOCKS] +
         o[NodeProp.SHARED_DIRTIED_BLOCKS] +
         o[NodeProp.SHARED_WRITTEN_BLOCKS];
     }
-    const highestSharedBuffers = _.maxBy(flat, (o) => {
-      return sumBuffers(o);
+    const highestShared = _.maxBy(flat, (o) => {
+      return sumShared(o);
     });
-    if (highestSharedBuffers) {
-      this.maxSharedBlocks = sumBuffers(highestSharedBuffers);
+    if (highestShared) {
+      this.maxSharedBlocks = sumShared(highestShared);
+    }
+
+    function sumTemp(o: Node) {
+      return o[NodeProp.TEMP_HIT_BLOCKS] +
+        o[NodeProp.TEMP_READ_BLOCKS] +
+        o[NodeProp.TEMP_DIRTIED_BLOCKS] +
+        o[NodeProp.TEMP_WRITTEN_BLOCKS];
+    }
+    const highestTemp = _.maxBy(flat, (o) => {
+      return sumTemp(o);
+    });
+    if (highestTemp) {
+      this.maxTempBlocks = sumTemp(highestTemp);
     }
   }
 
