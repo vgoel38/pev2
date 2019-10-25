@@ -310,7 +310,7 @@ export default class Plan extends Vue {
         return;
       }
       const components = this.plan.nodeComponents;
-      this.flatten(this.flat, 0, this.rootNode, components);
+      this.flatten(this.flat, 0, this.rootNode, components, true, []);
     }, 200);
 
   }
@@ -368,11 +368,28 @@ export default class Plan extends Vue {
     return _.round(time / executionTime * 100);
   }
 
-  private flatten(output: any[], level: number, node: Node, components: PlanNode[]) {
-    output.push([level, components.shift()]);
+
+  private flatten(output: any[], level: number, node: Node, components: PlanNode[], isLast: boolean,
+                  branches: number[]) {
+    // [level, node, isLastSibbling, branches]
+    output.push([level, components.shift(), isLast, _.concat([], branches)]);
+    if (!isLast) {
+      branches.push(level);
+    }
+
     _.each(node.Plans, (subnode) => {
-      this.flatten(output, level + 1, subnode, components);
+      this.flatten(
+        output,
+        level + 1,
+        subnode,
+        components,
+        subnode === _.last(node.Plans),
+        branches,
+      );
     });
+    if (!isLast) {
+      branches.pop();
+    }
   }
 
   private toggleDiagram(): void {

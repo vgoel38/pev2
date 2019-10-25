@@ -11,9 +11,12 @@
     </div>
     <table class="my-1 table-hover">
       <tbody>
-        <tr v-for="row in data" :content="tooltip(row[1])" v-tippy="{arrow: true, animation: 'fade', delay: [200, 0]}" @click.prevent="showNode(row[1], false, true)">
+        <tr v-for="row, index in data" :content="tooltip(row[1])" v-tippy="{arrow: true, animation: 'fade', delay: [200, 0]}" @click.prevent="showNode(row[1], false, true)">
           <th class="node-type pr-2">
-            <template v-for="i in lodash.range(row[0])">⠀</template>{{ nodeType(row) }}
+            <template v-for="i in lodash.range(row[0])">
+              <template v-if="lodash.indexOf(row[3], i) != -1">│</template><template v-else>⠀</template>
+            </template>{{ row[2] ? '└' : '├' }}
+            {{ nodeType(row) }}
           </th>
           <td>
             <div class="progress rounded-0 align-items-center bg-transparent" style="height: 5px;" v-if="metric == metrics.TIME">
