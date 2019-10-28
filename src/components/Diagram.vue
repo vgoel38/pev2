@@ -2,21 +2,21 @@
   <div>
     <div class="form-group text-center my-1">
       <div class="btn-group btn-group-xs">
-        <button class="btn btn-outline-secondary" :class="{'active': metric === metrics.time}" v-on:click="metric = metrics.time">time</button>
-        <button class="btn btn-outline-secondary" :class="{'active': metric === metrics.rows}" v-on:click="metric = metrics.rows">rows</button>
-        <button class="btn btn-outline-secondary" :class="{'active': metric === metrics.cost}" v-on:click="metric = metrics.cost">cost</button>
-        <button class="btn btn-outline-secondary" :class="{'active': metric === metrics.buffers}" v-on:click="metric = metrics.buffers">buffers</button>
+        <button class="btn btn-outline-secondary" :class="{'active': viewOptions.metric === metrics.time}" v-on:click="viewOptions.metric = metrics.time">time</button>
+        <button class="btn btn-outline-secondary" :class="{'active': viewOptions.metric === metrics.rows}" v-on:click="viewOptions.metric = metrics.rows">rows</button>
+        <button class="btn btn-outline-secondary" :class="{'active': viewOptions.metric === metrics.cost}" v-on:click="viewOptions.metric = metrics.cost">cost</button>
+        <button class="btn btn-outline-secondary" :class="{'active': viewOptions.metric === metrics.buffers}" v-on:click="viewOptions.metric = metrics.buffers">buffers</button>
       </div>
     </div>
-    <div class="form-group text-center my-1" v-if="metric == metrics.buffers">
+    <div class="form-group text-center my-1" v-if="viewOptions.metric == metrics.buffers">
       <div class="btn-group btn-group-xs">
-        <button class="btn btn-outline-secondary" :class="{'active': buffersMetric === buffersMetrics.shared}" v-on:click="buffersMetric = buffersMetrics.shared">shared</button>
-        <button class="btn btn-outline-secondary" :class="{'active': buffersMetric === buffersMetrics.temp}" v-on:click="buffersMetric = buffersMetrics.temp">temp</button>
-        <button class="btn btn-outline-secondary" :class="{'active': buffersMetric === buffersMetrics.local}" v-on:click="buffersMetric = buffersMetrics.local">local</button>
+        <button class="btn btn-outline-secondary" :class="{'active': viewOptions.buffersMetric === buffersMetrics.shared}" v-on:click="viewOptions.buffersMetric = buffersMetrics.shared">shared</button>
+        <button class="btn btn-outline-secondary" :class="{'active': viewOptions.buffersMetric === buffersMetrics.temp}" v-on:click="viewOptions.buffersMetric = buffersMetrics.temp">temp</button>
+        <button class="btn btn-outline-secondary" :class="{'active': viewOptions.buffersMetric === buffersMetrics.local}" v-on:click="viewOptions.buffersMetric = buffersMetrics.local">local</button>
       </div>
     </div>
     <div class="legend text-center">
-      <ul class="list-unstyled list-inline mb-0" v-if="metric == metrics.buffers">
+      <ul class="list-unstyled list-inline mb-0" v-if="viewOptions.metric == metrics.buffers">
         <li class="list-inline-item">
           <span class="bg-hit rounded"></span>
           Hit
@@ -45,29 +45,29 @@
             {{ nodeType(row) }}
           </th>
           <td>
-            <div class="progress rounded-0 align-items-center bg-transparent" style="height: 5px;" v-if="metric == metrics.time">
+            <div class="progress rounded-0 align-items-center bg-transparent" style="height: 5px;" v-if="viewOptions.metric == metrics.time">
               <div class="bg-secondary" role="progressbar" :style="'opacity: 0.2;width: ' + (row[1].node[nodeProps.INCLUSIVE_DURATION] - row[1].node[nodeProps.ACTUAL_DURATION]) / (plan.planStats.executionTime || plan.content.Plan[nodeProps.ACTUAL_TOTAL_TIME]) * 100 + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 1px;"></div>
               <div class="progress-bar border-left bg-secondary" role="progressbar" :style="'width: ' + row[1].node[nodeProps.ACTUAL_DURATION] / (plan.planStats.executionTime || plan.content.Plan[nodeProps.ACTUAL_TOTAL_TIME]) * 100 + '%; height:5px;'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
-            <div class="progress rounded-0 align-items-center bg-transparent" style="height: 5px;" v-else-if="metric == metrics.rows">
+            <div class="progress rounded-0 align-items-center bg-transparent" style="height: 5px;" v-else-if="viewOptions.metric == metrics.rows">
               <div class="bg-secondary" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.ACTUAL_ROWS] / plan.planStats.maxRows * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
             </div>
-            <div class="progress rounded-0 align-items-center bg-transparent" style="height: 5px;" v-else-if="metric == metrics.cost">
+            <div class="progress rounded-0 align-items-center bg-transparent" style="height: 5px;" v-else-if="viewOptions.metric == metrics.cost">
               <div class="bg-secondary" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.ACTUAL_COST] / plan.planStats.maxCost * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
             </div>
-            <div class="progress rounded-0 align-items-center bg-transparent" style="height: 5px;" v-else-if="metric == metrics.buffers && buffersMetric == buffersMetrics.shared && plan.planStats.maxSharedBlocks">
+            <div class="progress rounded-0 align-items-center bg-transparent" style="height: 5px;" v-else-if="viewOptions.metric == metrics.buffers && viewOptions.buffersMetric == buffersMetrics.shared && plan.planStats.maxSharedBlocks">
               <div class="bg-hit" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.SHARED_HIT_BLOCKS] / plan.planStats.maxSharedBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
               <div class="bg-read" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.SHARED_READ_BLOCKS] / plan.planStats.maxSharedBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
               <div class="bg-dirtied" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.SHARED_DIRTIED_BLOCKS] / plan.planStats.maxSharedBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
               <div class="bg-written" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.SHARED_WRITTEN_BLOCKS] / plan.planStats.maxSharedBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
             </div>
-            <div class="progress rounded-0 align-items-center bg-transparent" style="height: 5px;" v-else-if="metric == metrics.buffers && buffersMetric == buffersMetrics.temp && plan.planStats.maxTempBlocks">
+            <div class="progress rounded-0 align-items-center bg-transparent" style="height: 5px;" v-else-if="viewOptions.metric == metrics.buffers && viewOptions.buffersMetric == buffersMetrics.temp && plan.planStats.maxTempBlocks">
               <div class="bg-hit" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.TEMP_HIT_BLOCKS] / plan.planStats.maxTempBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
               <div class="bg-read" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.TEMP_READ_BLOCKS] / plan.planStats.maxTempBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
               <div class="bg-dirtied" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.TEMP_DIRTIED_BLOCKS] / plan.planStats.maxTempBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
               <div class="bg-written" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.TEMP_WRITTEN_BLOCKS] / plan.planStats.maxTempBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
             </div>
-            <div class="progress rounded-0 align-items-center bg-transparent" style="height: 5px;" v-else-if="metric == metrics.buffers && buffersMetric == buffersMetrics.local && plan.planStats.maxLocalBlocks">
+            <div class="progress rounded-0 align-items-center bg-transparent" style="height: 5px;" v-else-if="viewOptions.metric == metrics.buffers && viewOptions.buffersMetric == buffersMetrics.local && plan.planStats.maxLocalBlocks">
               <div class="bg-hit" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.LOCAL_HIT_BLOCKS] / plan.planStats.maxLocalBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
               <div class="bg-read" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.LOCAL_READ_BLOCKS] / plan.planStats.maxLocalBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
               <div class="bg-dirtied" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.LOCAL_DIRTIED_BLOCKS] / plan.planStats.maxLocalBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
@@ -82,7 +82,7 @@
 
 <script lang="ts">
 import * as _ from 'lodash';
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { duration, durationClass, rows } from '@/filters';
 import { BuffersMetric, NodeProp, Metric } from '../enums';
 import PlanNode from '@/components/PlanNode.vue';
@@ -103,11 +103,25 @@ export default class Diagram extends Vue {
   private metrics = Metric;
   private buffersMetrics = BuffersMetric;
 
-  private metric: Metric = Metric.buffers;
-  private buffersMetric: BuffersMetric = BuffersMetric.shared;
+  private viewOptions: any = {
+    metric: Metric.time,
+    buffersMetric: BuffersMetric.shared,
+  };
+
+  private created(): void {
+    const savedOptions = localStorage.getItem('diagramViewOptions');
+    if (savedOptions) {
+      _.assignIn(this.viewOptions, JSON.parse(savedOptions));
+    }
+  }
+
+  @Watch('viewOptions', {deep: true})
+  private onViewOptionsChanged(val: any, oldVal: any) {
+    localStorage.setItem('diagramViewOptions', JSON.stringify(this.viewOptions));
+  }
 
   private tooltip(cmp: PlanNode): string {
-    switch (this.metric) {
+    switch (this.viewOptions.metric) {
       case Metric.time:
         return this.timeTooltip(cmp);
       case Metric.rows:
@@ -150,7 +164,7 @@ export default class Diagram extends Vue {
     let read;
     let written;
     let dirtied;
-    switch (this.buffersMetric) {
+    switch (this.viewOptions.buffersMetric) {
       case BuffersMetric.shared:
         hit = cmp.node[NodeProp.SHARED_HIT_BLOCKS];
         read = cmp.node[NodeProp.SHARED_READ_BLOCKS];
@@ -175,7 +189,7 @@ export default class Diagram extends Vue {
     text += dirtied ? '<br>Dirtied: ' + rows(dirtied) : '';
     text += written ? '<br>Written: ' + rows(written) : '';
     text = text ? text : ' N/A';
-    switch (this.buffersMetric) {
+    switch (this.viewOptions.buffersMetric) {
       case BuffersMetric.shared:
         text = 'Shared Blocks:' + text;
         break;
