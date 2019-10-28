@@ -9,6 +9,26 @@
         <button class="btn btn-outline-secondary" :class="{'active': metric === metrics.TEMP}" v-on:click="metric = metrics.TEMP">{{ metrics.TEMP }}</button>
       </div>
     </div>
+    <div class="legend text-center">
+      <ul class="list-unstyled list-inline mb-0" v-if="metric == metrics.SHARED || metric == metrics.TEMP">
+        <li class="list-inline-item">
+          <span class="bg-hit rounded"></span>
+          Hit
+        </li>
+        <li class="list-inline-item">
+          <span class="bg-read"></span>
+          Read
+        </li>
+        <li class="list-inline-item">
+          <span class="bg-written"></span>
+          Written
+        </li>
+        <li class="list-inline-item">
+          <span class="bg-dirtied"></span>
+          Dirtied
+        </li>
+      </ul>
+    </div>
     <table class="my-1 table-hover">
       <tbody>
         <tr v-for="row, index in data" :content="tooltip(row[1])" v-tippy="{arrow: true, animation: 'fade', delay: [200, 0]}" @click.prevent="showNode(row[1], false, true)">
