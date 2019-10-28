@@ -2,8 +2,12 @@ export class Metric {
     public static TIME: string = 'time';
     public static ROWS: string = 'rows';
     public static COST: string = 'cost';
-    public static SHARED: string = 'shared';
-    public static TEMP: string = 'temp';
+    public static BUFFERS: string = 'buffers';
+}
+
+export class BuffersMetric {
+  public static SHARED: string = 'shared';
+  public static TEMP: string = 'temp';
 }
 
 export enum BufferLocation {
