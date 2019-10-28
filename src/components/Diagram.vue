@@ -40,8 +40,8 @@
         <tr v-for="row, index in data" :content="tooltip(row[1])" v-tippy="{arrow: true, animation: 'fade', delay: [200, 0]}" @click.prevent="showNode(row[1], false, true)">
           <th class="node-type pr-2">
             <template v-for="i in lodash.range(row[0])">
-              <template v-if="lodash.indexOf(row[3], i) != -1">│</template><template v-else>⠀</template>
-            </template>{{ row[2] ? '└' : '├' }}
+              <template v-if="lodash.indexOf(row[3], i) != -1">│</template><template v-else-if="i !== 0">⠀</template>
+            </template>{{ index !== 0 ? (row[2] ? '└' : '├') : '' }}
             {{ nodeType(row) }}
           </th>
           <td>
