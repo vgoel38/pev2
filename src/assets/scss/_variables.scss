@@ -56,7 +56,7 @@ $alert-color: #FB4418;
 
 $severity-colors: (
   1: #ccc,
-  2: #fe8,
+  2: #FDDB61,
   3: #e80,
   4: #800
 ) !default;
@@ -109,25 +109,11 @@ $yiq-text-light:            $white !default;
 }
 
 $buffers-colors: (
-  hit: #2c7bb6,
-  read: #abd9e9,
-  written: #9B59B6,
-  dirtied: #fdae61
+  hit: map-get($severity-colors, 1),
+  read: map-get($severity-colors, 2),
+  dirtied: map-get($severity-colors, 3),
+  written: map-get($severity-colors, 4),
 ) !default;
-
-//$buffers-colors: (
-  //hit: #a6611a,
-  //read: #dfc27d,
-  //written: #80cdc1,
-  //dirtied: #018471
-//) !default;
-
-//$buffers-colors: (
-  //hit: #BDC3C7,
-  //read: #9B59B6,
-  //written: #3498DB,
-  //dirtied: #26B99A
-//) !default;
 
 
 /**

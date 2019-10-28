@@ -26,12 +26,12 @@
           Read
         </li>
         <li class="list-inline-item">
-          <span class="bg-written"></span>
-          Written
-        </li>
-        <li class="list-inline-item">
           <span class="bg-dirtied"></span>
           Dirtied
+        </li>
+        <li class="list-inline-item">
+          <span class="bg-written"></span>
+          Written
         </li>
       </ul>
     </div>
@@ -58,20 +58,20 @@
             <div class="progress rounded-0 align-items-center bg-transparent" style="height: 5px;" v-else-if="metric == metrics.buffers && buffersMetric == buffersMetrics.shared && plan.planStats.maxSharedBlocks">
               <div class="bg-hit" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.SHARED_HIT_BLOCKS] / plan.planStats.maxSharedBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
               <div class="bg-read" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.SHARED_READ_BLOCKS] / plan.planStats.maxSharedBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
-              <div class="bg-written" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.SHARED_WRITTEN_BLOCKS] / plan.planStats.maxSharedBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
               <div class="bg-dirtied" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.SHARED_DIRTIED_BLOCKS] / plan.planStats.maxSharedBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
+              <div class="bg-written" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.SHARED_WRITTEN_BLOCKS] / plan.planStats.maxSharedBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
             </div>
             <div class="progress rounded-0 align-items-center bg-transparent" style="height: 5px;" v-else-if="metric == metrics.buffers && buffersMetric == buffersMetrics.temp && plan.planStats.maxTempBlocks">
               <div class="bg-hit" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.TEMP_HIT_BLOCKS] / plan.planStats.maxTempBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
               <div class="bg-read" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.TEMP_READ_BLOCKS] / plan.planStats.maxTempBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
-              <div class="bg-written" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.TEMP_WRITTEN_BLOCKS] / plan.planStats.maxTempBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
               <div class="bg-dirtied" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.TEMP_DIRTIED_BLOCKS] / plan.planStats.maxTempBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
+              <div class="bg-written" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.TEMP_WRITTEN_BLOCKS] / plan.planStats.maxTempBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
             </div>
             <div class="progress rounded-0 align-items-center bg-transparent" style="height: 5px;" v-else-if="metric == metrics.buffers && buffersMetric == buffersMetrics.local && plan.planStats.maxLocalBlocks">
               <div class="bg-hit" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.LOCAL_HIT_BLOCKS] / plan.planStats.maxLocalBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
               <div class="bg-read" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.LOCAL_READ_BLOCKS] / plan.planStats.maxLocalBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
-              <div class="bg-written" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.LOCAL_WRITTEN_BLOCKS] / plan.planStats.maxLocalBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
               <div class="bg-dirtied" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.LOCAL_DIRTIED_BLOCKS] / plan.planStats.maxLocalBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
+              <div class="bg-written" role="progressbar" :style="'width: ' + Math.round(row[1].node[nodeProps.LOCAL_WRITTEN_BLOCKS] / plan.planStats.maxLocalBlocks * 100) + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
             </div>
           </td>
         </tr>
@@ -154,26 +154,26 @@ export default class Diagram extends Vue {
       case BuffersMetric.shared:
         hit = cmp.node[NodeProp.SHARED_HIT_BLOCKS];
         read = cmp.node[NodeProp.SHARED_READ_BLOCKS];
-        written = cmp.node[NodeProp.SHARED_WRITTEN_BLOCKS];
         dirtied = cmp.node[NodeProp.SHARED_DIRTIED_BLOCKS];
+        written = cmp.node[NodeProp.SHARED_WRITTEN_BLOCKS];
         break;
       case BuffersMetric.temp:
         hit = cmp.node[NodeProp.TEMP_HIT_BLOCKS];
         read = cmp.node[NodeProp.TEMP_READ_BLOCKS];
-        written = cmp.node[NodeProp.TEMP_WRITTEN_BLOCKS];
         dirtied = cmp.node[NodeProp.TEMP_DIRTIED_BLOCKS];
+        written = cmp.node[NodeProp.TEMP_WRITTEN_BLOCKS];
         break;
       case BuffersMetric.local:
         hit = cmp.node[NodeProp.LOCAL_HIT_BLOCKS];
         read = cmp.node[NodeProp.LOCAL_READ_BLOCKS];
-        written = cmp.node[NodeProp.LOCAL_WRITTEN_BLOCKS];
         dirtied = cmp.node[NodeProp.LOCAL_DIRTIED_BLOCKS];
+        written = cmp.node[NodeProp.LOCAL_WRITTEN_BLOCKS];
         break;
     }
     text += hit ? '<br>Hit: ' + rows(hit) : '';
     text += read ? '<br>Read: ' + rows(read) : '';
-    text += written ? '<br>Written: ' + rows(written) : '';
     text += dirtied ? '<br>Dirtied: ' + rows(dirtied) : '';
+    text += written ? '<br>Written: ' + rows(written) : '';
     text = text ? text : ' N/A';
     switch (this.buffersMetric) {
       case BuffersMetric.shared:
