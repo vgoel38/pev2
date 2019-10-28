@@ -124,20 +124,8 @@
       </div>
       <div class="form-check mr-2 border-left pl-2">
         <input id="showDiagram" type="checkbox" v-model="viewOptions.showDiagram" class="form-check-input">
-        <label for="showDiagram" class="form-check-label">Diagram</label>
+        <label for="showDiagram" class="form-check-label"><i class="fa fa-align-left"></i> Diagram</label>
       </div>
-      <button
-        :class="['d-inline-block btn btn-xs mr-2 rounded-0', viewOptions.diagramSide == sides.LEFT ? 'border-dark bg-secondary' : 'border-secondary bg-light']"
-        style="border-left-width: 4px !important; width: 15px; height: 15px;"
-        @click="viewOptions.diagramSide = sides.LEFT"
-      >
-      </button>
-      <button
-        :class="['d-inline-block btn btn-xs mr-2 rounded-0', viewOptions.diagramSide == sides.TOP ? 'border-dark bg-secondary' : 'border-secondary bg-light']"
-        style="border-top-width: 4px !important; width: 15px; height: 15px;"
-        @click="viewOptions.diagramSide = sides.TOP"
-      >
-      </button>
       <div class="form-check mr-2 pl-2 border-left">
         <input id="showCost" type="checkbox" v-model="viewOptions.showCost" class="form-check-input" :disabled="rootNode[nodeProps.TOTAL_COST] === undefined">
         <label for="showCost" class="form-check-label">Cost</label>
@@ -177,9 +165,9 @@
         </div>
       </div>
     </div>
-    <div v-else :class="['overflow-hidden flex-grow-1 flex-shrink-1 d-flex', {'flex-column': viewOptions.diagramSide == sides.TOP}]">
+    <div v-else class="overflow-hidden flex-grow-1 flex-shrink-1 d-flex">
       <div ref="diagram"
-           :class="['plan-diagram overflow-auto flex-shrink-0', viewOptions.diagramSide == sides.TOP ? 'border-bottom plan-diagram-top' : 'border-right plan-diagram-left h-100']"
+           class="plan-diagram overflow-auto flex-shrink-0 border-right plan-diagram-left h-100"
         v-if="viewOptions.showDiagram"
       >
         <diagram :data="flat" :plan="plan" :showNode="showNode" v-if="flat"></diagram>
@@ -207,7 +195,7 @@ import Diagram from '@/components/Diagram.vue';
 import { HelpService, scrollChildIntoParentView } from '@/services/help-service';
 import { PlanService } from '@/services/plan-service';
 import { cost, duration, durationClass, rows } from '@/filters';
-import { NodeProp, Orientation, Side, ViewMode } from '../enums';
+import { NodeProp, Orientation, ViewMode } from '../enums';
 import { IPlan } from '../iplan';
 import Node from '../inode';
 
@@ -264,12 +252,10 @@ export default class Plan extends Vue {
     viewMode: ViewMode.FULL,
     orientation: Orientation.TWOD,
     showDiagram: true,
-    diagramSide: Side.LEFT,
   };
 
   private viewModes = ViewMode;
   private orientations = Orientation;
-  private sides = Side;
 
   private planService = new PlanService();
   private nodeProps = NodeProp;

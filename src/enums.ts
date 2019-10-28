@@ -41,11 +41,6 @@ export class Orientation {
   public static CLASSIC: string = 'classic';
 }
 
-export class Side {
-  public static LEFT: string = 'left';
-  public static TOP: string = 'top';
-}
-
 export class NodeProp {
   // plan property keys
   public static NODE_TYPE: string = 'Node Type';
