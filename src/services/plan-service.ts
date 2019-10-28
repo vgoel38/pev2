@@ -15,6 +15,7 @@ export class PlanService {
   private maxDuration: number | undefined;
   private maxSharedBlocks: number | undefined;
   private maxTempBlocks: number | undefined;
+  private maxLocalBlocks: number | undefined;
 
   public createPlan(planName: string, planContent: any, planQuery: string): IPlan {
     // remove any extra white spaces in the middle of query
@@ -48,6 +49,7 @@ export class PlanService {
     plan.content.maxDuration = this.maxDuration;
     plan.content.maxSharedBlocks = this.maxSharedBlocks;
     plan.content.maxTempBlocks = this.maxTempBlocks;
+    plan.content.maxLocalBlocks = this.maxLocalBlocks;
   }
 
   // recursively walk down the plan to compute various metrics
@@ -121,6 +123,19 @@ export class PlanService {
     });
     if (highestTemp) {
       this.maxTempBlocks = sumTemp(highestTemp);
+    }
+
+    function sumLocal(o: Node) {
+      return o[NodeProp.LOCAL_HIT_BLOCKS] +
+        o[NodeProp.LOCAL_READ_BLOCKS] +
+        o[NodeProp.LOCAL_DIRTIED_BLOCKS] +
+        o[NodeProp.LOCAL_WRITTEN_BLOCKS];
+    }
+    const highestLocal = _.maxBy(flat, (o) => {
+      return sumLocal(o);
+    });
+    if (highestLocal) {
+      this.maxLocalBlocks = sumLocal(highestLocal);
     }
   }
 

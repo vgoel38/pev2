@@ -8,6 +8,7 @@ export enum Metric {
 export enum BuffersMetric {
   shared,
   temp,
+  local,
 }
 
 export enum BufferLocation {
@@ -81,6 +82,10 @@ export class NodeProp {
   public static TEMP_READ_BLOCKS: string = 'Temp Read Blocks';
   public static TEMP_DIRTIED_BLOCKS: string = 'Temp Dirtied Blocks';
   public static TEMP_WRITTEN_BLOCKS: string = 'Temp Written Blocks';
+  public static LOCAL_HIT_BLOCKS: string = 'Local Hit Blocks';
+  public static LOCAL_READ_BLOCKS: string = 'Local Read Blocks';
+  public static LOCAL_DIRTIED_BLOCKS: string = 'Local Dirtied Blocks';
+  public static LOCAL_WRITTEN_BLOCKS: string = 'Local Written Blocks';
 
   // computed by pev
   public static COSTLIEST_NODE: string = '*Costiest Node (by cost)';
