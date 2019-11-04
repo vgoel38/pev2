@@ -151,6 +151,7 @@ export class PlanService {
 
       node[NodeProp.INCLUSIVE_DURATION] = node[NodeProp.ACTUAL_DURATION];
       node[NodeProp.ACTUAL_DURATION] = node[NodeProp.ACTUAL_DURATION] - this.childrenDuration(node, 0);
+      node.begin = this.childrenLatestStartupTime(node);
     }
 
     if (node[NodeProp.TOTAL_COST]) {
@@ -180,6 +181,15 @@ export class PlanService {
       }
     });
     return duration;
+  }
+
+  // recursive function to get the latest startup time
+  // This will be used to know when the current node starts doing some work
+  public childrenLatestStartupTime(node: Node) {
+    const latest = _.maxBy(node[NodeProp.PLANS], (child: Node) => {
+      return child[NodeProp.ACTUAL_STARTUP_TIME];
+    });
+    return latest ? latest[NodeProp.ACTUAL_STARTUP_TIME] : 0;
   }
 
   // figure out order of magnitude by which the planner mis-estimated how many rows would be
