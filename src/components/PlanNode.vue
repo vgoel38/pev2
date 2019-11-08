@@ -141,6 +141,13 @@
 
           <div class="text-muted text-right"><em>* Calculated value</em></div>
         </div>
+        <div>
+          <div class="progress rounded-0 align-items-center bg-transparent" style="height: 5px;">
+            <div class="bg-secondary" role="progressbar" :style="'opacity: 0.2;width: ' + node.begin / (plan.planStats.executionTime || plan.content.Plan[nodeProps.ACTUAL__TIME]) * 100 + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 1px;"></div>
+            <div class="bg-secondary" role="progressbar" :style="'opacity: 0.4;width: ' + (node[nodeProps.ACTUAL_STARTUP_TIME] - node.begin) / (plan.planStats.executionTime || plan.content.Plan[nodeProps.ACTUAL__TIME]) * 100 + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
+            <div class="progress-bar border-left border-secondary bg-secondary" role="progressbar" :style="'width: ' + (node[nodeProps.ACTUAL_TOTAL_TIME] - node[nodeProps.ACTUAL_STARTUP_TIME]) / (plan.planStats.executionTime || plan.content.Plan[nodeProps.ACTUAL_TOTAL_TIME]) * 100 + '%; height:5px;'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+        </div>
 
       </div>
     </div>
