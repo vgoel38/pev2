@@ -46,8 +46,8 @@
           </th>
           <td>
             <div class="progress rounded-0 align-items-center bg-transparent" style="height: 5px;" v-if="viewOptions.metric == metrics.time">
-              <div class="bg-secondary" role="progressbar" :style="'opacity: 0.2;width: ' + row[1].node.begin / (plan.planStats.executionTime || plan.content.Plan[nodeProps.ACTUAL__TIME]) * 100 + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 1px;"></div>
-              <div class="bg-secondary" role="progressbar" :style="'opacity: 0.4;width: ' + (row[1].node[nodeProps.ACTUAL_STARTUP_TIME] - row[1].node.begin) / (plan.planStats.executionTime || plan.content.Plan[nodeProps.ACTUAL__TIME]) * 100 + '%'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
+              <div class="bg-secondary" role="progressbar" :style="'opacity: 0.4;width: ' + (row[1].node[nodeProps.ACTUAL_ENTRY_TIME]) / (plan.planStats.executionTime || plan.content.Plan[nodeProps.ACTUAL_TOTAL_TIME]) * 100 + '%; height: 1px;'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>
+              <div class="progress-bar border-left border-secondary bg-secondary" role="progressbar" :style="'width: ' + (row[1].node[nodeProps.ACTUAL_STARTUP_TIME]) / (plan.planStats.executionTime || plan.content.Plan[nodeProps.ACTUAL_TOTAL_TIME]) * 100 + '%; height:5px;opacity: 0.5;'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>
               <div class="progress-bar border-left border-secondary bg-secondary" role="progressbar" :style="'width: ' + (row[1].node[nodeProps.ACTUAL_TOTAL_TIME] - row[1].node[nodeProps.ACTUAL_STARTUP_TIME]) / (plan.planStats.executionTime || plan.content.Plan[nodeProps.ACTUAL_TOTAL_TIME]) * 100 + '%; height:5px;'" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
             <div class="progress rounded-0 align-items-center bg-transparent" style="height: 5px;" v-else-if="viewOptions.metric == metrics.rows">
@@ -137,11 +137,14 @@ export default class Diagram extends Vue {
 
   private timeTooltip(cmp: PlanNode): string {
     return [
-      'Duration: ',
-      duration(cmp.node[NodeProp.ACTUAL_DURATION], true),
-      ' | ',
-      cmp.executionTimePercent,
-      '%',
+      'Entry: ',
+      cmp.node[NodeProp.ACTUAL_ENTRY_TIME] + ' (' + cmp.node[NodeProp.ACTUAL_ABSOLUTE_ENTRY_TIME] + ')',
+      '<br>',
+      'startup: ',
+      cmp.node[NodeProp.ACTUAL_STARTUP_TIME],
+      '<br>',
+      'total: ',
+      cmp.node[NodeProp.ACTUAL_TOTAL_TIME],
     ].join('');
   }
 

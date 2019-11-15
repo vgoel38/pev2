@@ -137,6 +137,13 @@ export class PlanService {
     if (highestLocal) {
       this.maxLocalBlocks = sumLocal(highestLocal);
     }
+
+    const firstEntryTime = _.minBy(flat, (o) => {
+      return o[NodeProp.ACTUAL_ABSOLUTE_ENTRY_TIME];
+    })[NodeProp.ACTUAL_ABSOLUTE_ENTRY_TIME];
+    _.each(flat, (o) => {
+      o[NodeProp.ACTUAL_ENTRY_TIME] = (o[NodeProp.ACTUAL_ABSOLUTE_ENTRY_TIME] - firstEntryTime) * 1000;
+    });
   }
 
   // actual duration and actual cost are calculated by subtracting child values from the total
@@ -350,7 +357,7 @@ export class PlanService {
       const openParenthesisRegex = '\\(';
       const closeParenthesisRegex = '\\)';
       // tslint:disable-next-line:max-line-length
-      const actualRegex = '(?:actual\\stime=(\\d+\\.\\d+)\\.\\.(\\d+\\.\\d+)\\srows=(\\d+)\\sloops=(\\d+)|actual\\srows=(\\d+)\\sloops=(\\d+)|(never\\s+executed))';
+      const actualRegex = '(?:actual\\stime=(\\d+\\.\\d+)\\.\\.(\\d+\\.\\d+)\\srows=(\\d+)\\sloops=(\\d+)(\\sentrytime=(\\d+\\.\\d+))*|actual\\srows=(\\d+)\\sloops=(\\d+)|(never\\s+executed))';
       const optionalGroup = '?';
 
       const a = new RegExp(
@@ -369,17 +376,18 @@ export class PlanService {
        * 8: actual_time_last
        * 9: actual_rows
        * 10: actual_loops
-       * 11: actual_rows_
-       * 12: actual_loops_
-       * 13: never_executed
-       * 14: estimated_startup_cost
-       * 15: estimated_total_cost
-       * 16: estimated_rows
-       * 17: estimated_row_width
-       * 18: actual_time_first
-       * 19: actual_time_last
-       * 20: actual_rows
-       * 21: actual_loops
+       * 12: actual_entrytime
+       * 13: actual_rows_
+       * 14: actual_loops_
+       * 15: never_executed
+       * 16: estimated_startup_cost
+       * 17: estimated_total_cost
+       * 18: estimated_rows
+       * 19: estimated_row_width
+       * 20: actual_time_first
+       * 21: actual_time_last
+       * 22: actual_rows
+       * 23: actual_loops
        */
       const nodeRegex = new RegExp(
         prefixRegex +
@@ -444,22 +452,26 @@ export class PlanService {
 
       if (nodeMatches) {
         const prefix = nodeMatches[1];
-        const neverExecuted = nodeMatches[13];
+        const neverExecuted = nodeMatches[15];
         const newNode: Node = new Node(nodeMatches[2]);
-        if (nodeMatches[3] && nodeMatches[4] || nodeMatches[14] && nodeMatches[15]) {
-          newNode[NodeProp.STARTUP_COST] = parseFloat(nodeMatches[3] || nodeMatches[14]);
-          newNode[NodeProp.TOTAL_COST] = parseFloat(nodeMatches[4] || nodeMatches[15]);
-          newNode[NodeProp.PLAN_ROWS] = parseInt(nodeMatches[5] || nodeMatches[16], 0);
+        if (nodeMatches[3] && nodeMatches[4] || nodeMatches[16] && nodeMatches[17]) {
+          newNode[NodeProp.STARTUP_COST] = parseFloat(nodeMatches[3] || nodeMatches[16]);
+          newNode[NodeProp.TOTAL_COST] = parseFloat(nodeMatches[4] || nodeMatches[17]);
+          newNode[NodeProp.PLAN_ROWS] = parseInt(nodeMatches[5] || nodeMatches[18], 0);
         }
-        if (nodeMatches[7] && nodeMatches[8] || nodeMatches[18] && nodeMatches[19]) {
-          newNode[NodeProp.ACTUAL_STARTUP_TIME] = parseFloat(nodeMatches[7] || nodeMatches[18]);
-          newNode[NodeProp.ACTUAL_TOTAL_TIME] = parseFloat(nodeMatches[8] || nodeMatches[19]);
+        if (nodeMatches[7] && nodeMatches[8] || nodeMatches[20] && nodeMatches[21]) {
+          newNode[NodeProp.ACTUAL_STARTUP_TIME] = parseFloat(nodeMatches[7] || nodeMatches[20]);
+          newNode[NodeProp.ACTUAL_TOTAL_TIME] = parseFloat(nodeMatches[8] || nodeMatches[21]);
         }
 
-        if (nodeMatches[9] && nodeMatches[10] || nodeMatches[11] && nodeMatches[12] ||
-            nodeMatches[20] && nodeMatches[21]) {
-          newNode[NodeProp.ACTUAL_ROWS] = parseInt(nodeMatches[9] || nodeMatches[11] || nodeMatches[20], 0);
-          newNode[NodeProp.ACTUAL_LOOPS] = parseInt(nodeMatches[10] || nodeMatches[12] || nodeMatches[21], 0);
+        if (nodeMatches[9] && nodeMatches[10] || nodeMatches[13] && nodeMatches[14] ||
+            nodeMatches[22] && nodeMatches[23]) {
+          newNode[NodeProp.ACTUAL_ROWS] = parseInt(nodeMatches[9] || nodeMatches[13] || nodeMatches[22], 0);
+          newNode[NodeProp.ACTUAL_LOOPS] = parseInt(nodeMatches[10] || nodeMatches[14] || nodeMatches[23], 0);
+        }
+
+        if (nodeMatches[25]) {
+          newNode[NodeProp.ACTUAL_ABSOLUTE_ENTRY_TIME] = nodeMatches[25];
         }
 
         if (neverExecuted) {

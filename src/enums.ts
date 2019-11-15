@@ -49,6 +49,8 @@ export class NodeProp {
   public static ACTUAL_STARTUP_TIME: string = 'Actual Startup Time';
   public static ACTUAL_TOTAL_TIME: string = 'Actual Total Time';
   public static ACTUAL_LOOPS: string = 'Actual Loops';
+  public static ACTUAL_ABSOLUTE_ENTRY_TIME: string = 'Actual Absolute Entry Time';
+  public static ACTUAL_ENTRY_TIME: string = 'Actual Entry Time';
   public static STARTUP_COST: string = 'Startup Cost';
   public static TOTAL_COST: string = 'Total Cost';
   public static PLANS: string = 'Plans';
