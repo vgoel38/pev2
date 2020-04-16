@@ -98,6 +98,10 @@ $yiq-text-light:            $white !default;
     }
   }
 
+  .fa.c-#{$color} {
+    color: $value;
+  }
+
   .progress-bar.c-#{$color} {
     background-color: $value;
     border-color: $value !important;

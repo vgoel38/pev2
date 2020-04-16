@@ -23,7 +23,8 @@
         </template>
         <template v-else>
           <span class="stat-value">
-            <span :class="'mb-0 p-0 px-1 alert ' + planningTimeClass(plan.planStats.planningTime / plan.planStats.executionTime * 100)"
+            <highlight-icon :cls="planningTimeClass(plan.planStats.planningTime / plan.planStats.executionTime * 100)"></highlight-icon>
+            <span class="mb-0 p-0 px-1"
                    v-html="$options.filters.duration(plan.planStats.planningTime)"></span>
           </span>
         </template>
@@ -31,8 +32,9 @@
       <div class="d-inline-block border-left px-2" v-if="plan.planStats.jitTime">
         JIT:
         <span class="stat-value">
-          <span :class="'mb-0 p-0 px-1 alert ' + planningTimeClass(plan.planStats.jitTime / plan.planStats.executionTime * 100)"
-                 v-html="$options.filters.duration(plan.planStats.jitTime)"></span>
+          <highlight-icon :cls="planningTimeClass(plan.planStats.jitTime / plan.planStats.executionTime * 100)"></highlight-icon>
+          <span class="mb-0 p-0 px-1"
+                v-html="$options.filters.duration(plan.planStats.jitTime)"></span>
         </span>
       </div>
       <div class="d-inline-block border-left px-2">
@@ -81,7 +83,8 @@
         <span class="stat-label">Triggers: </span>
         <template v-if="plan.planStats.triggers.length">
           <span class="stat-value">
-            <span :class="'mb-0 p-0 px-1 alert ' + durationClass(totalTriggerDurationPercent)" v-html="$options.filters.duration(triggersTotalDuration)"></span>
+            <highlight-icon :cls="durationClass(totalTriggerDurationPercent)"></highlight-icon>
+            <span class="mb-0 p-0 px-1" v-html="$options.filters.duration(triggersTotalDuration)"></span>
           </span>
           <button @click.prevent="showTriggers = !showTriggers" class="bg-transparent border-0 p-0 m-0 pl-1">
             <i class="fa fa-caret-down text-muted"></i>
@@ -223,6 +226,7 @@ import 'splitpanes/dist/splitpanes.css';
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import PlanNode from '@/components/PlanNode.vue';
 import Diagram from '@/components/Diagram.vue';
+import HighlightIcon from '@/components/HighlightIcon.vue';
 import { HelpService, scrollChildIntoParentView } from '@/services/help-service';
 import { PlanService } from '@/services/plan-service';
 import { cost, duration, durationClass, rows } from '@/filters';
@@ -241,6 +245,7 @@ Vue.component('tippy', TippyComponent);
   components: {
     PlanNode,
     Diagram,
+    HighlightIcon,
     Splitpanes,
     Pane,
   },

@@ -16,7 +16,8 @@
           </h4>
           <span v-if="viewOptions.viewMode === viewModes.FULL">
             <span class="node-duration" v-if="node[nodeProps.ACTUAL_DURATION]">
-              <span :class="'p-0 px-1 rounded alert ' + durationClass"
+              <highlight-icon :cls="durationClass"></highlight-icon>
+              <span class="p-0 px-1"
                 v-html="$options.filters.duration(node[nodeProps.ACTUAL_DURATION])">
               </span>
               <template v-if="executionTimePercent !== Infinity">
@@ -79,18 +80,20 @@
 
         <div v-if="shouldShowCost && node[nodeProps.ACTUAL_COST]">
           <span>
+            <highlight-icon :cls="costClass"></highlight-icon>&nbsp;
             Cost:
-            <span :class="'p-0 px-1 alert ' + costClass">{{node[nodeProps.ACTUAL_COST] | cost}}</span>
+            <span class="p-0 px-1">{{node[nodeProps.ACTUAL_COST] | cost}}</span>
             |
             <span>{{ costPercent }}<span class="text-muted">%</span></span>
           </span>
         </div>
 
         <div v-if="shouldShowPlannerEstimate() && plannerRowEstimateDirection != estimateDirections.none && plannerRowEstimateValue">
+          <highlight-icon :cls="estimationClass"></highlight-icon>&nbsp;
           <span v-if="plannerRowEstimateDirection === estimateDirections.over"><strong><i class="fa fa-arrow-up"></i> over</strong> estimated rows</span>
           <span v-if="plannerRowEstimateDirection === estimateDirections.under"><strong><i class="fa fa-arrow-down"></i> under</strong> estimated rows</span>
           <span v-if="plannerRowEstimateValue != Infinity"> by
-            <span :class="'p-0 px-1 alert ' + estimationClass">
+            <span class="p-0 px-1">
               <strong v-html="$options.filters.factor(plannerRowEstimateValue)"></strong>
             </span>
           </span>
@@ -152,6 +155,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import HighlightIcon from '@/components/HighlightIcon.vue';
 import { HelpService } from '@/services/help-service';
 import { ColorService } from '@/services/color-service';
 import { cost, duration, factor, formatNodeProp, keysToString, truncate, rows } from '@/filters';
@@ -169,6 +173,9 @@ import * as _ from 'lodash';
     keysToString,
     truncate,
     rows,
+  },
+  components: {
+    HighlightIcon,
   },
 })
 export default class PlanNode extends Vue {
